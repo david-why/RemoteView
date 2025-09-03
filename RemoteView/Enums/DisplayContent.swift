@@ -7,7 +7,16 @@
 
 import Foundation
 
-enum DisplayContent: Codable {
+enum DisplayContent: Codable, Hashable {
     case none
     case text(String)
+    case off
+    
+    var type: DisplayContentType {
+        switch self {
+        case .none: .none
+        case .text(_): .text
+        case .off: .off
+        }
+    }
 }

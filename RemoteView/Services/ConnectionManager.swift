@@ -61,4 +61,16 @@ class ConnectionManager {
         print("Destroyed ConnectionManager")
         socket.disconnect()
     }
+    
+    func control(room: String, content: DisplayContent) throws {
+        let jsonData = try JSONEncoder().encode(content)
+        guard let objectData = try JSONSerialization.jsonObject(with: jsonData) as? [String: Any] else {
+            throw ConnectionManagerError.failedToConvertToJSON
+        }
+        socket.emit("control", room, objectData)
+    }
+}
+
+enum ConnectionManagerError: Error {
+    case failedToConvertToJSON
 }

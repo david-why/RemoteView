@@ -11,6 +11,7 @@ struct DisplayView: View {
     let name: String
     
     @State private var connectionManager = ConnectionManager(url: Config.socketURL)
+    @State private var brightness = UIScreen.main.brightness
     
     var body: some View {
         VStack {
@@ -19,6 +20,21 @@ struct DisplayView: View {
         .toolbar(.hidden, for: .navigationBar)
         .onAppear {
             connectionManager.room = name
+            UIApplication.shared.isIdleTimerDisabled = true
+        }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
+            if connectionManager.displayContent == .none {
+                UIScreen.main.brightness = brightness
+            }
+        }
+        .onChange(of: connectionManager.displayContent) { old, new in
+            if new == .off {
+                brightness = UIScreen.main.brightness
+                UIScreen.main.brightness = 0.0
+            } else if old == .off {
+                UIScreen.main.brightness = brightness
+            }
         }
     }
     
@@ -35,6 +51,8 @@ struct DisplayView: View {
             }
         case .text(let text):
             Text(text)
+        case .off:
+            BlackView()
         }
     }
     

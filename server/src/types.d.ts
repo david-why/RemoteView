@@ -11,14 +11,22 @@ export interface SocketEmitEvents {
 
 // "Enums" (in quotes because Swift enums aren't actually enums...?)
 
-interface DisplayContentNone {
-  none: Record<string, never>
+interface DisplayContentBase {
+  none?: never
   text?: never
+  off?: never
 }
 
-interface DisplayContentText {
-  none?: never
+interface DisplayContentNone extends DisplayContentBase {
+  none: Record<string, never>
+}
+
+interface DisplayContentText extends DisplayContentBase {
   text: { _0: string }
 }
 
-export type DisplayContent = DisplayContentNone | DisplayContentText
+interface DisplayContentOff extends DisplayContentBase {
+  off: Record<string, never>
+}
+
+export type DisplayContent = DisplayContentNone | DisplayContentText | DisplayContentOff

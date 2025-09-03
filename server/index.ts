@@ -22,6 +22,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('control', (target, content) => {
+    console.log('Control command from', socket.id, 'to', target, 'Content:', content)
     io.to(target).emit('display', content)
   })
 
@@ -34,7 +35,7 @@ io.on('connection', (socket) => {
   })
 
   setTimeout(() => {
-    socket.emit('display', { text: { _0: '123' } })
+    socket.emit('display', { off: {} })
   }, 1000)
 })
 
