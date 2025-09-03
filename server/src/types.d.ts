@@ -1,6 +1,9 @@
 // Socket.IO types
 
-export interface SocketListenEvents {}
+export interface SocketListenEvents {
+  control: (target: string, content: DisplayContent) => void
+  setname: (name: string) => void
+}
 
 export interface SocketEmitEvents {
   display: (content: DisplayContent) => void

@@ -24,6 +24,6 @@ struct Config {
     }
     
     static var socketURL: URL {
-        apiBaseURL.appending(path: "socket.io")
+        apiBaseURL
     }
 }

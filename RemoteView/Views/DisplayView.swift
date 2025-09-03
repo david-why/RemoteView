@@ -8,13 +8,18 @@
 import SwiftUI
 
 struct DisplayView: View {
-    @State private var connectionManager = ConnectionManager(url: URL(string: "http://localhost:31422")!)
+    let name: String
+    
+    @State private var connectionManager = ConnectionManager(url: Config.socketURL)
     
     var body: some View {
         VStack {
             contentBody
         }
         .toolbar(.hidden, for: .navigationBar)
+        .onAppear {
+            connectionManager.room = name
+        }
     }
     
     @ViewBuilder var contentBody: some View {
@@ -44,5 +49,5 @@ struct DisplayView: View {
 }
 
 #Preview {
-    DisplayView()
+    DisplayView(name: "test")
 }

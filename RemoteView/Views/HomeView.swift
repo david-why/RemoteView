@@ -9,6 +9,8 @@ import SwiftUI
 
 struct HomeView: View {
     @State var path = NavigationPath()
+    @State var name = ""
+    @State var isAskingDisplayName = false
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -21,7 +23,8 @@ struct HomeView: View {
                     }
                     Spacer()
                     button(label: "Display", style: .purple) {
-                        path.append(ViewType.display)
+                        name = ""
+                        isAskingDisplayName = true
                     }
                     Spacer()
                 }
@@ -29,6 +32,13 @@ struct HomeView: View {
             }
             .navigationDestination(for: ViewType.self) { type in
                 childView(for: type)
+            }
+            .alert("Please enter the display room name.", isPresented: $isAskingDisplayName) {
+                TextField("Room name", text: $name)
+                Button("Cancel", role: .cancel) {}
+                Button("OK") {
+                    path.append(ViewType.display(name: name))
+                }
             }
         }
     }
@@ -63,13 +73,13 @@ struct HomeView: View {
     @ViewBuilder func childView(for type: ViewType) -> some View {
         switch type {
         case .control: ControlView()
-        case .display: DisplayView()
+        case .display(let name): DisplayView(name: name)
         }
     }
 
-    enum ViewType {
+    enum ViewType: Hashable {
         case control
-        case display
+        case display(name: String)
     }
 }
 

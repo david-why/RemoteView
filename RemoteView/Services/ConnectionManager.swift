@@ -13,6 +13,13 @@ import SocketIO
 class ConnectionManager {
     let manager: SocketManager
     let socket: SocketIOClient
+    var room: String? = nil {
+        didSet {
+            if let room {
+                socket.emit("setname", room)
+            }
+        }
+    }
     
     var displayContent: DisplayContent = .none
     
@@ -22,8 +29,11 @@ class ConnectionManager {
         self.manager = SocketManager(socketURL: url, config: [.forceWebsockets(true)])
         self.socket = manager.defaultSocket
         
-        socket.on(clientEvent: .connect) { data, ack in
+        socket.on(clientEvent: .connect) { [weak self] data, ack in
             print("Socket connected")
+            if let room = self?.room {
+                self?.socket.emit("setname", room)
+            }
         }
         socket.on(clientEvent: .error) { data, ack in
             print("Socket.IO error: \(data)")

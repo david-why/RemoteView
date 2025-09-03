@@ -21,6 +21,18 @@ io.on('connection', (socket) => {
     console.log('Client disconnected:', socket.id, 'Reason:', reason)
   })
 
+  socket.on('control', (target, content) => {
+    io.to(target).emit('display', content)
+  })
+
+  socket.on('setname', (name) => {
+    console.log('Client set name:', socket.id, 'New name:', name)
+    socket.rooms.forEach((r) => {
+      if (r != socket.id) socket.leave(r)
+    })
+    socket.join(name)
+  })
+
   setTimeout(() => {
     socket.emit('display', { text: { _0: '123' } })
   }, 1000)
