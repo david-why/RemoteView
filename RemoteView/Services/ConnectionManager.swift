@@ -9,19 +9,17 @@ import Foundation
 import Combine
 import SocketIO
 
+@Observable
 class ConnectionManager {
     let manager: SocketManager
     let socket: SocketIOClient
     
-    private let contentPublisher = PassthroughSubject<DisplayContent, Never>()
-    var displayContent: AnyPublisher<DisplayContent, Never> {
-        AnyPublisher(contentPublisher)
-    }
+    var displayContent: DisplayContent = .none
     
     init(url: URL) {
         print("Created ConnectionManager for url \(url)")
         
-        self.manager = SocketManager(socketURL: url)
+        self.manager = SocketManager(socketURL: url, config: [.forceWebsockets(true)])
         self.socket = manager.defaultSocket
         
         socket.on(clientEvent: .connect) { data, ack in
@@ -31,21 +29,26 @@ class ConnectionManager {
             print("Socket.IO error: \(data)")
         }
         socket.on("display") { [weak self] data, ack in
-            guard let objectData = data[0] as? Data else {
-                print("Display data \(data) is not a string, ignoring packet")
+            guard let objectData = data[0] as? [String: Any] else {
+                print("Display data \(data) is not a dictionary, ignoring packet")
                 return
             }
-            guard let displayContent = try? JSONDecoder().decode(DisplayContent.self, from: objectData) else {
-                print("Display data \(objectData) is not valid JSON, ignoring packet")
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: objectData, options: []) else {
+                print("Failed to convert dictionary \(objectData) to JSON data")
+                return
+            }   
+            guard let displayContent = try? JSONDecoder().decode(DisplayContent.self, from: jsonData) else {
+                print("Display data \(objectData) is not a valid DisplayContent, ignoring packet")
                 return
             }
-            self?.contentPublisher.send(displayContent)
+            self?.displayContent = displayContent
         }
         
         socket.connect()
     }
     
     deinit {
+        print("Destroyed ConnectionManager")
         socket.disconnect()
     }
 }

@@ -8,20 +8,16 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var content: DisplayContent = .none
-    @State private var connectionManager = ConnectionManager(url: Config.socketURL)
+    @State private var connectionManager = ConnectionManager(url: URL(string: "http://localhost:31422")!)
     
     var body: some View {
         VStack {
             contentBody
         }
-        .onReceive(connectionManager.displayContent) { content in
-            self.content = content
-        }
     }
     
     @ViewBuilder var contentBody: some View {
-        switch content {
+        switch connectionManager.displayContent {
         case .none:
             Image(systemName: "globe")
                 .foregroundStyle(Color.accentColor)
@@ -38,8 +34,11 @@ struct ContentView: View {
     
     func debugPrintJSON() {
         let encoder = JSONEncoder()
-        print(String(data: try! encoder.encode(DisplayContent.none), encoding: .utf8)!)
-        print(String(data: try! encoder.encode(DisplayContent.text("Some Text")), encoding: .utf8)!)
+        let printJSON: (DisplayContent) -> Void = { content in
+            print(String(data: try! encoder.encode(content), encoding: .utf8)!)
+        }
+        printJSON(.none)
+        printJSON(.text("Some Text"))
     }
 }
 
