@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		63750E752E683D6B00C38AEC /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 63750E742E683D6B00C38AEC /* README.md */; };
+		63750E782E68414400C38AEC /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = 63750E772E68414400C38AEC /* SocketIO */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63750E782E68414400C38AEC /* SocketIO in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,6 +73,7 @@
 			);
 			name = RemoteView;
 			packageProductDependencies = (
+				63750E772E68414400C38AEC /* SocketIO */,
 			);
 			productName = RemoteView;
 			productReference = 63DC01AD2E683D04004A8BCB /* RemoteView.app */;
@@ -100,6 +103,9 @@
 			);
 			mainGroup = 63DC01A42E683D04004A8BCB;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				63750E762E68414400C38AEC /* XCRemoteSwiftPackageReference "socket" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 63DC01AE2E683D04004A8BCB /* Products */;
 			projectDirPath = "";
@@ -331,6 +337,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		63750E762E68414400C38AEC /* XCRemoteSwiftPackageReference "socket" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 16.1.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		63750E772E68414400C38AEC /* SocketIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 63750E762E68414400C38AEC /* XCRemoteSwiftPackageReference "socket" */;
+			productName = SocketIO;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 63DC01A52E683D04004A8BCB /* Project object */;
 }

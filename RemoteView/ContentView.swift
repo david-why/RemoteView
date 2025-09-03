@@ -8,14 +8,25 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var content: DisplayContent = .none
+    
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            contentBody
         }
-        .padding()
+    }
+    
+    @ViewBuilder var contentBody: some View {
+        switch content {
+        case .none:
+            Image(systemName: "globe")
+                .foregroundStyle(Color.accentColor)
+                .font(.largeTitle)
+                .padding()
+            Text("No content displayed yet!")
+        case .text(let text):
+            Text(text)
+        }
     }
 }
 
