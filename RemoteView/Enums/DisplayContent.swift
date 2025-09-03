@@ -9,5 +9,5 @@ import Foundation
 
 enum DisplayContent: Codable {
     case none
-    case text(text: String)
+    case text(String)
 }
