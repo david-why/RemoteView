@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct ControlView: View {
-    @State var room = "1"
+    @AppStorage(DefaultsKeys.room) var room = ""
     @State var displayType = DisplayContentType.none
     @State var displayText = ""
     @State var displayURL = ""
     
-    @State var connectionManager = ConnectionManager(url: Config.socketURL)
+    @StateObject var connectionManager = ConnectionManager(url: Config.socketURL)
     
     var body: some View {
         List {
@@ -95,6 +95,12 @@ struct ControlView: View {
         .navigationTitle("Control")
         .animation(.default, value: displayType)
         .toolbar {
+            Button("Status", systemImage: statusButtonImage) {
+                if connectionManager.status == .connecting {
+                    connectionManager.socket.connect()
+                }
+            }
+            .tint(statusButtonColor)
             Button("Send", systemImage: "paperplane") {
                 do {
                     try connectionManager.control(room: room, content: getDisplayContent())
@@ -102,6 +108,22 @@ struct ControlView: View {
                     print("Error sending control message: \(error)")
                 }
             }
+        }
+    }
+    
+    var statusButtonImage: String {
+        switch connectionManager.status {
+        case .connected: return "checkmark.circle"
+        case .connecting: return "arrow.clockwise.circle"
+        default: return "xmark.circle"
+        }
+    }
+    
+    var statusButtonColor: Color? {
+        switch connectionManager.status {
+        case .connected: return nil
+        case .connecting: return .orange
+        default: return .red
         }
     }
     

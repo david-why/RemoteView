@@ -9,8 +9,10 @@ import SwiftUI
 
 struct HomeView: View {
     @State var path = NavigationPath()
-    @State var name = ""
     @State var isAskingDisplayName = false
+    
+    @AppStorage(DefaultsKeys.room) var name = ""
+    @AppStorage(DefaultsKeys.apiURL) var apiURL = Config.defaultApiBaseURL.absoluteString
     
     var body: some View {
         NavigationStack(path: $path) {
@@ -29,6 +31,13 @@ struct HomeView: View {
                     Spacer()
                 }
                 .padding()
+                DisclosureGroup("\(Image(systemName: "gear")) Settings") {
+                    Text("API URL")
+                        .font(.headline)
+                    TextField("API URL", text: $apiURL)
+                        .multilineTextAlignment(.center)
+                }
+                .frame(maxWidth: 300)
             }
             .navigationDestination(for: ViewType.self) { type in
                 childView(for: type)
@@ -56,7 +65,7 @@ struct HomeView: View {
             )
     }
     
-    @ViewBuilder func button(label: LocalizedStringKey, style: some ShapeStyle, perform: @escaping () -> Void) -> some View {
+    @ViewBuilder func button(label: LocalizedStringKey, style: Color, perform: @escaping () -> Void) -> some View {
         Button(action: perform) {
             ZStack {
                 Rectangle()
@@ -65,7 +74,7 @@ struct HomeView: View {
                     .frame(idealWidth: 200, maxWidth: 200, minHeight: 100, idealHeight: 100, maxHeight: 100)
                 Text(label)
                     .font(.title2)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(Color(.label))
             }
         }
     }

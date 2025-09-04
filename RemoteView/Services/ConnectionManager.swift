@@ -9,8 +9,7 @@ import Foundation
 import Combine
 import SocketIO
 
-@Observable
-class ConnectionManager {
+class ConnectionManager: ObservableObject {
     let manager: SocketManager
     let socket: SocketIOClient
     var room: String? = nil {
@@ -21,7 +20,8 @@ class ConnectionManager {
         }
     }
     
-    var displayContent: DisplayContent = .none
+    @Published private(set) var displayContent: DisplayContent = .none
+    @Published private(set) var status: SocketIOStatus = .notConnected
     
     init(url: URL) {
         print("Created ConnectionManager for url \(url)")
@@ -30,9 +30,14 @@ class ConnectionManager {
         self.socket = manager.defaultSocket
         
         socket.on(clientEvent: .connect) { [weak self] data, ack in
-            print("Socket connected")
             if let room = self?.room {
                 self?.socket.emit("setname", room)
+            }
+        }
+        socket.on(clientEvent: .statusChange) { [weak self] data, ack in
+            print("Socket status changed, \(data)")
+            if let self, let status = data[0] as? SocketIOStatus {
+                self.status = status
             }
         }
         socket.on(clientEvent: .error) { data, ack in
@@ -43,7 +48,7 @@ class ConnectionManager {
                 print("Display data \(data) is not a dictionary, ignoring packet")
                 return
             }
-            guard let jsonData = try? JSONSerialization.data(withJSONObject: objectData, options: []) else {
+            guard let jsonData = try? JSONSerialization.data(withJSONObject: objectData) else {
                 print("Failed to convert dictionary \(objectData) to JSON data")
                 return
             }   

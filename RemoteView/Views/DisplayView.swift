@@ -11,7 +11,7 @@ import WebKit
 struct DisplayView: View {
     let name: String
     
-    @State private var connectionManager = ConnectionManager(url: Config.socketURL)
+    @StateObject private var connectionManager = ConnectionManager(url: Config.socketURL)
     @State private var brightness = UIScreen.main.brightness
     
     @State private var webView: WKWebView?
@@ -32,11 +32,11 @@ struct DisplayView: View {
                 UIScreen.main.brightness = brightness
             }
         }
-        .onChange(of: connectionManager.displayContent) { old, new in
+        .onChange(of: connectionManager.displayContent) { new in
             if new == .off {
                 brightness = UIScreen.main.brightness
                 UIScreen.main.brightness = 0.0
-            } else if old == .off {
+            } else if connectionManager.displayContent == .off {
                 UIScreen.main.brightness = brightness
             }
         }

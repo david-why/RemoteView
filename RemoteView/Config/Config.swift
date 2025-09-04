@@ -15,12 +15,24 @@ struct Config {
         return value
     }
     
-    static var apiBaseURL: URL {
+    static var defaultApiBaseURL: URL {
         let urlString: String = value(for: "APIBaseURL")
         guard let url = URL(string: urlString) else {
             fatalError("Invalid API Base URL string: \(urlString)")
         }
         return url
+    }
+    
+    static var apiBaseURL: URL {
+        if let urlString = UserDefaults.standard.string(forKey: DefaultsKeys.apiURL),
+           let url = URL(string: urlString) {
+            return url
+        }
+        return defaultApiBaseURL
+    }
+    
+    static var defaultSocketURL: URL {
+        defaultApiBaseURL
     }
     
     static var socketURL: URL {
