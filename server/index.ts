@@ -35,7 +35,7 @@ io.on('connection', (socket) => {
   })
 
   setTimeout(() => {
-    socket.emit('display', { off: {} })
+    socket.emit('display', { web: { _0: 'https://example.com' } })
   }, 1000)
 })
 

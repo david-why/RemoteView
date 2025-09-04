@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import WebKit
 
 struct DisplayView: View {
     let name: String
@@ -13,11 +14,14 @@ struct DisplayView: View {
     @State private var connectionManager = ConnectionManager(url: Config.socketURL)
     @State private var brightness = UIScreen.main.brightness
     
+    @State private var webView: WKWebView?
+    @State private var canGoBack = false
+    @State private var canGoForward = false
+
     var body: some View {
         VStack {
             contentBody
         }
-        .toolbar(.hidden, for: .navigationBar)
         .onAppear {
             connectionManager.room = name
             UIApplication.shared.isIdleTimerDisabled = true
@@ -36,6 +40,37 @@ struct DisplayView: View {
                 UIScreen.main.brightness = brightness
             }
         }
+        .navigationBarBackButtonHidden()
+        .if(!isWebView) { $0.toolbar(.hidden, for: .navigationBar) }
+        .if(isWebView) {
+            $0.toolbar {
+                Button("Home", systemImage: "house") {
+                    if let webView, case let .web(url) = connectionManager.displayContent {
+                        webView.reloadFromOrigin()
+                        if webView.canGoBack, let item = webView.backForwardList.backList.first {
+                            webView.go(to: item)
+                        }
+                        webView.load(URLRequest(url: url))
+                    }
+                }
+                Button("Back", systemImage: "chevron.backward") {
+                    webView?.goBack()
+                }
+                .disabled(!canGoBack)
+                Button("Forward", systemImage: "chevron.forward") {
+                    webView?.goForward()
+                }
+                .disabled(!canGoForward)
+            }
+        }
+    }
+    
+    var isWebView: Bool {
+        if case .web(_) = connectionManager.displayContent {
+            return true
+        } else {
+            return false
+        }
     }
     
     @ViewBuilder var contentBody: some View {
@@ -53,6 +88,10 @@ struct DisplayView: View {
             Text(text)
         case .off:
             BlackView()
+        case .web(let url):
+            WebView(url: url, canGoBack: $canGoBack, canGoForward: $canGoForward) {
+                webView = $0
+            }
         }
     }
     

@@ -11,6 +11,7 @@ struct ControlView: View {
     @State var room = "1"
     @State var displayType = DisplayContentType.none
     @State var displayText = ""
+    @State var displayURL = ""
     
     @State var connectionManager = ConnectionManager(url: Config.socketURL)
     
@@ -36,6 +37,19 @@ struct ControlView: View {
                     }
                     
                     HStack {
+                        Text("⬛️ Off")
+                        Spacer()
+                        if displayType == .off {
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(Color.accentColor)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        displayType = .off
+                    }
+                    
+                    HStack {
                         Text("🔡 Text")
                         Spacer()
                         if displayType == .text {
@@ -53,6 +67,28 @@ struct ControlView: View {
                     if displayType == .text {
                         TextField("Enter text to display...", text: $displayText)
                     }
+                    
+                    HStack {
+                        Text("🔗 Website")
+                        Spacer()
+                        if displayType == .web {
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(Color.accentColor)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        if displayType != .web {
+                            displayType = .web
+                            displayURL = ""
+                        }
+                    }
+                    if displayType == .web {
+                        TextField("Enter URL to display...", text: $displayURL)
+                            .keyboardType(.URL)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                    }
                 }
             }
         }
@@ -61,7 +97,7 @@ struct ControlView: View {
         .toolbar {
             Button("Send", systemImage: "paperplane") {
                 do {
-                    try connectionManager.control(room: room, content: displayContent)
+                    try connectionManager.control(room: room, content: getDisplayContent())
                 } catch {
                     print("Error sending control message: \(error)")
                 }
@@ -69,13 +105,22 @@ struct ControlView: View {
         }
     }
     
-    var displayContent: DisplayContent {
+    func getDisplayContent() throws -> DisplayContent {
         switch displayType {
-        case .none: .none
-        case .text: .text(displayText)
-        case .off: .off
+        case .none: return .none
+        case .text: return .text(displayText)
+        case .off: return .off
+        case .web:
+            guard let url = URL(string: displayURL) else {
+                throw ControlViewError.invalidURL
+            }
+            return .web(url)
         }
     }
+}
+
+enum ControlViewError: Error {
+    case invalidURL
 }
 
 #Preview {

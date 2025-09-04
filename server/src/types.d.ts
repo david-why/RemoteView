@@ -15,6 +15,7 @@ interface DisplayContentBase {
   none?: never
   text?: never
   off?: never
+  web?: never
 }
 
 interface DisplayContentNone extends DisplayContentBase {
@@ -29,4 +30,8 @@ interface DisplayContentOff extends DisplayContentBase {
   off: Record<string, never>
 }
 
-export type DisplayContent = DisplayContentNone | DisplayContentText | DisplayContentOff
+interface DisplayContentWeb extends DisplayContentBase {
+  web: { _0: string }
+}
+
+export type DisplayContent = DisplayContentNone | DisplayContentText | DisplayContentOff | DisplayContentWeb
