@@ -71,19 +71,19 @@ struct ControlView: View {
                     HStack {
                         Text("🔗 Website")
                         Spacer()
-                        if displayType == .web {
+                        if displayType == .webview {
                             Image(systemName: "checkmark")
                                 .foregroundStyle(Color.accentColor)
                         }
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        if displayType != .web {
-                            displayType = .web
+                        if displayType != .webview {
+                            displayType = .webview
                             displayURL = ""
                         }
                     }
-                    if displayType == .web {
+                    if displayType == .webview {
                         TextField("Enter URL to display...", text: $displayURL)
                             .keyboardType(.URL)
                             .autocorrectionDisabled()
@@ -132,11 +132,11 @@ struct ControlView: View {
         case .none: return .none
         case .text: return .text(displayText)
         case .off: return .off
-        case .web:
+        case .webview:
             guard let url = URL(string: displayURL) else {
                 throw ControlViewError.invalidURL
             }
-            return .web(url)
+            return .webview(url)
         }
     }
 }

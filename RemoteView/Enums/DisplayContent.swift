@@ -7,18 +7,18 @@
 
 import Foundation
 
-enum DisplayContent: Codable, Hashable {
+enum DisplayContent: Codable, Hashable, Equatable {
     case none
     case text(String)
     case off
-    case web(URL)
+    case webview(URL)
     
     var type: DisplayContentType {
         switch self {
         case .none: .none
         case .text(_): .text
         case .off: .off
-        case .web(_): .web
+        case .webview(_): .webview
         }
     }
 }

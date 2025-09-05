@@ -17,6 +17,7 @@ struct DisplayView: View {
     @State private var webView: WKWebView?
     @State private var canGoBack = false
     @State private var canGoForward = false
+    @State private var webViewTitle = ""
 
     var body: some View {
         VStack {
@@ -24,6 +25,7 @@ struct DisplayView: View {
         }
         .onAppear {
             connectionManager.room = name
+            print("Disabling idle timer")
             UIApplication.shared.isIdleTimerDisabled = true
         }
         .onDisappear {
@@ -32,26 +34,15 @@ struct DisplayView: View {
                 UIScreen.main.brightness = originalBrightness
             }
         }
-        .onChange(of: connectionManager.displayContent) { [old = connectionManager.displayContent] new in
-            if new == .off {
-                originalBrightness = UIScreen.main.brightness
-                UIScreen.main.wantsSoftwareDimming = true
-                UIScreen.main.brightness = 0.0
-            } else if old == .off {
-                UIScreen.main.brightness = originalBrightness
-            }
-        }
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
+        .persistentSystemOverlays(.hidden)
         .if(!isWebView) { $0.toolbar(.hidden, for: .navigationBar) }
         .if(isWebView) {
             $0.toolbar {
                 Button("Home", systemImage: "house") {
-                    if let webView, case let .web(url) = connectionManager.displayContent {
-                        webView.reloadFromOrigin()
-                        if webView.canGoBack, let item = webView.backForwardList.backList.first {
-                            webView.go(to: item)
-                        }
-                        webView.load(URLRequest(url: url))
+                    if let webView, case let .webview(url) = connectionManager.displayContent {
+                        webView.clearAndLoad(url: url)
                     }
                 }
                 Button("Back", systemImage: "chevron.backward") {
@@ -67,7 +58,7 @@ struct DisplayView: View {
     }
     
     var isWebView: Bool {
-        if case .web(_) = connectionManager.displayContent {
+        if case .webview(_) = connectionManager.displayContent {
             return true
         } else {
             return false
@@ -89,10 +80,12 @@ struct DisplayView: View {
             Text(text)
         case .off:
             BlackView()
-        case .web(let url):
-            WebView(url: url, canGoBack: $canGoBack, canGoForward: $canGoForward) {
+        case .webview(let url):
+            WebView(url: url, canGoBack: $canGoBack, canGoForward: $canGoForward, title: $webViewTitle) {
                 webView = $0
             }
+            .id(url)
+            .navigationTitle(webViewTitle)
         }
     }
     

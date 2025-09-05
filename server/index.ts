@@ -33,10 +33,6 @@ io.on('connection', (socket) => {
     })
     socket.join(name)
   })
-
-  setTimeout(() => {
-    socket.emit('display', { web: { _0: 'https://example.com' } })
-  }, 1000)
 })
 
 Bun.serve({

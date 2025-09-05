@@ -11,5 +11,5 @@ enum DisplayContentType {
     case none
     case text
     case off
-    case web
+    case webview
 }

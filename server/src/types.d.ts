@@ -15,7 +15,7 @@ interface DisplayContentBase {
   none?: never
   text?: never
   off?: never
-  web?: never
+  webview?: never
 }
 
 interface DisplayContentNone extends DisplayContentBase {
@@ -31,7 +31,7 @@ interface DisplayContentOff extends DisplayContentBase {
 }
 
 interface DisplayContentWeb extends DisplayContentBase {
-  web: { _0: string }
+  webview: { _0: string }
 }
 
 export type DisplayContent = DisplayContentNone | DisplayContentText | DisplayContentOff | DisplayContentWeb
