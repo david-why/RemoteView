@@ -12,7 +12,7 @@ struct DisplayView: View {
     let name: String
     
     @StateObject private var connectionManager = ConnectionManager(url: Config.socketURL)
-    @State private var brightness = UIScreen.main.brightness
+    @State private var originalBrightness = UIScreen.main.brightness
     
     @State private var webView: WKWebView?
     @State private var canGoBack = false
@@ -28,16 +28,17 @@ struct DisplayView: View {
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
-            if connectionManager.displayContent == .none {
-                UIScreen.main.brightness = brightness
+            if connectionManager.displayContent == .off {
+                UIScreen.main.brightness = originalBrightness
             }
         }
-        .onChange(of: connectionManager.displayContent) { new in
+        .onChange(of: connectionManager.displayContent) { [old = connectionManager.displayContent] new in
             if new == .off {
-                brightness = UIScreen.main.brightness
+                originalBrightness = UIScreen.main.brightness
+                UIScreen.main.wantsSoftwareDimming = true
                 UIScreen.main.brightness = 0.0
-            } else if connectionManager.displayContent == .off {
-                UIScreen.main.brightness = brightness
+            } else if old == .off {
+                UIScreen.main.brightness = originalBrightness
             }
         }
         .navigationBarBackButtonHidden()

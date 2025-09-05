@@ -18,26 +18,27 @@ struct HomeView: View {
         NavigationStack(path: $path) {
             VStack {
                 title
-                HStack(spacing: 8) {
-                    Spacer()
+                HStack(spacing: 50) {
                     button(label: "Control", style: .green) {
                         path.append(ViewType.control)
                     }
-                    Spacer()
                     button(label: "Display", style: .purple) {
                         name = ""
                         isAskingDisplayName = true
                     }
-                    Spacer()
                 }
                 .padding()
                 DisclosureGroup("\(Image(systemName: "gear")) Settings") {
                     Text("API URL")
                         .font(.headline)
+                        .if(!isApiURLValid) { $0.foregroundStyle(.red) }
                     TextField("API URL", text: $apiURL)
                         .multilineTextAlignment(.center)
+                        .autocorrectionDisabled()
+                        .textInputAutocapitalization(.never)
                 }
-                .frame(maxWidth: 300)
+                .frame(maxWidth: 400)
+                .padding(.horizontal)
             }
             .navigationDestination(for: ViewType.self) { type in
                 childView(for: type)
@@ -84,6 +85,13 @@ struct HomeView: View {
         case .control: ControlView()
         case .display(let name): DisplayView(name: name)
         }
+    }
+    
+    var isApiURLValid: Bool {
+        if let url = URL(string: apiURL) {
+            return url.host() != nil
+        }
+        return false
     }
 
     enum ViewType: Hashable {

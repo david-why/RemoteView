@@ -9,10 +9,10 @@ import SwiftUI
 
 struct BlackView: View {
     var body: some View {
-        Rectangle()
+        Color.black
             .ignoresSafeArea()
-            .foregroundStyle(.black)
             .statusBarHidden()
+            .presentationDragIndicator(.hidden)
     }
 }
 
