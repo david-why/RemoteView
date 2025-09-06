@@ -19,9 +19,14 @@ struct DisplayView: View {
     @State private var canGoForward = false
     @State private var webViewTitle = ""
 
+    @Environment(\.scenePhase) var scenePhase
+    
     var body: some View {
         VStack {
             contentBody
+                .if(connectionManager.status == .connecting) {
+                    $0.navigationTitle(Text("🔄 Reconnecting..."))
+                }
         }
         .onAppear {
             connectionManager.room = name
@@ -37,7 +42,12 @@ struct DisplayView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
         .persistentSystemOverlays(.hidden)
-        .if(!isWebView) { $0.toolbar(.hidden, for: .navigationBar) }
+        .onChange(of: scenePhase) { new in
+            if new == .active {
+                print("Returned to foreground, disabling idle timer")
+                UIApplication.shared.isIdleTimerDisabled = true
+            }
+        }
         .if(isWebView) {
             $0.toolbar {
                 Button("Home", systemImage: "house") {
@@ -73,9 +83,9 @@ struct DisplayView: View {
                 .font(.largeTitle)
                 .padding()
             Text("No content displayed yet!")
-            Button("Print JSON of display types") {
-                debugPrintJSON()
-            }
+                .padding(.bottom)
+            Text("Please display content from the Control section of the app, using the same room name you entered.")
+                .multilineTextAlignment(.center)
         case .text(let text):
             Text(text)
         case .off:
@@ -87,15 +97,6 @@ struct DisplayView: View {
             .id(url)
             .navigationTitle(webViewTitle)
         }
-    }
-    
-    func debugPrintJSON() {
-        let encoder = JSONEncoder()
-        let printJSON: (DisplayContent) -> Void = { content in
-            print(String(data: try! encoder.encode(content), encoding: .utf8)!)
-        }
-        printJSON(.none)
-        printJSON(.text("Some Text"))
     }
 }
 

@@ -10,4 +10,6 @@ import Foundation
 struct DefaultsKeys {
     static let apiURL = "apiURL"
     static let room = "room"
+    static let controlText = "controlText"
+    static let controlURL = "controlURL"
 }

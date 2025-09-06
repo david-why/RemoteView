@@ -10,8 +10,8 @@ import SwiftUI
 struct ControlView: View {
     @AppStorage(DefaultsKeys.room) var room = ""
     @State var displayType = DisplayContentType.none
-    @State var displayText = ""
-    @State var displayURL = ""
+    @AppStorage(DefaultsKeys.controlText) var displayText = ""
+    @AppStorage(DefaultsKeys.controlURL) var displayURL = ""
     
     @StateObject var connectionManager = ConnectionManager(url: Config.socketURL)
     
@@ -23,66 +23,16 @@ struct ControlView: View {
             
             if !room.isEmpty {
                 Section("Display") {
-                    HStack {
-                        Text("⬜️ None")
-                        Spacer()
-                        if displayType == .none {
-                            Image(systemName: "checkmark")
-                                .foregroundStyle(Color.accentColor)
-                        }
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        displayType = .none
-                    }
+                    displayContentItem("⬜️ None", type: .none)
                     
-                    HStack {
-                        Text("⬛️ Off")
-                        Spacer()
-                        if displayType == .off {
-                            Image(systemName: "checkmark")
-                                .foregroundStyle(Color.accentColor)
-                        }
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        displayType = .off
-                    }
+                    displayContentItem("⬛️ Off", type: .off)
                     
-                    HStack {
-                        Text("🔡 Text")
-                        Spacer()
-                        if displayType == .text {
-                            Image(systemName: "checkmark")
-                                .foregroundStyle(Color.accentColor)
-                        }
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        if displayType != .text {
-                            displayType = .text
-                            displayText = ""
-                        }
-                    }
+                    displayContentItem("🔡 Text", type: .text)
                     if displayType == .text {
                         TextField("Enter text to display...", text: $displayText)
                     }
                     
-                    HStack {
-                        Text("🔗 Website")
-                        Spacer()
-                        if displayType == .webview {
-                            Image(systemName: "checkmark")
-                                .foregroundStyle(Color.accentColor)
-                        }
-                    }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        if displayType != .webview {
-                            displayType = .webview
-                            displayURL = ""
-                        }
-                    }
+                    displayContentItem("🔗 Website", type: .webview)
                     if displayType == .webview {
                         TextField("Enter URL to display...", text: $displayURL)
                             .keyboardType(.URL)
@@ -124,6 +74,22 @@ struct ControlView: View {
         case .connected: return nil
         case .connecting: return .orange
         default: return .red
+        }
+    }
+    
+    @ViewBuilder func displayContentItem(_ label: LocalizedStringKey, type: DisplayContentType, onTapGesture: (() -> Void)? = nil) -> some View {
+        HStack {
+            Text(label)
+            Spacer()
+            if displayType == type {
+                Image(systemName: "checkmark")
+                    .foregroundStyle(Color.accentColor)
+            }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            onTapGesture?()
+            displayType = type
         }
     }
     

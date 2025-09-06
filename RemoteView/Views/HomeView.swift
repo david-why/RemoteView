@@ -23,7 +23,6 @@ struct HomeView: View {
                         path.append(ViewType.control)
                     }
                     button(label: "Display", style: .purple) {
-                        name = ""
                         isAskingDisplayName = true
                     }
                 }
