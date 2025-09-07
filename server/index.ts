@@ -2,6 +2,8 @@ import { Server as Engine } from '@socket.io/bun-engine'
 import { Server } from 'socket.io'
 import type { SocketListenEvents, SocketEmitEvents } from './src/types'
 
+import indexPage from './index.html'
+
 const PORT = Number(process.env.PORT || '3000')
 
 const io = new Server<SocketListenEvents, SocketEmitEvents>()
@@ -37,6 +39,15 @@ io.on('connection', (socket) => {
 
 Bun.serve({
   port: PORT,
+  routes: {
+    '/demo.mp4': () =>
+      new Response(Bun.file('./public/demo.mp4'), {
+        headers: {
+          'Content-Type': 'video/mp4',
+        },
+      }),
+    '/': indexPage,
+  },
   ...engine.handler(),
 })
 
