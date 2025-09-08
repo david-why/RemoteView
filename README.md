@@ -12,9 +12,7 @@ Check out [the demo video](./server/public/demo.mp4)!
 
 ## How to Use
 
-[Join the TestFlight here!](https://testflight.apple.com/join/T5NtpK3d) (Note: If
-the TestFlight link doesn't work, the app may still be in review. Just check back
-in a few days!)
+[Join the TestFlight here!](https://testflight.apple.com/join/T5NtpK3d)
 
 ## Technical Description
 
