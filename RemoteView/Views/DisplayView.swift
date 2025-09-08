@@ -18,6 +18,7 @@ struct DisplayView: View {
     @State private var canGoBack = false
     @State private var canGoForward = false
     @State private var webViewTitle = ""
+    @State private var webViewCounter = 0
 
     @Environment(\.scenePhase) var scenePhase
     
@@ -48,30 +49,15 @@ struct DisplayView: View {
                 UIApplication.shared.isIdleTimerDisabled = true
             }
         }
-        .if(isWebView) {
-            $0.toolbar {
-                Button("Home", systemImage: "house") {
-                    if let webView, case let .webview(url) = connectionManager.displayContent {
-                        webView.clearAndLoad(url: url)
-                    }
-                }
-                Button("Back", systemImage: "chevron.backward") {
-                    webView?.goBack()
-                }
-                .disabled(!canGoBack)
-                Button("Forward", systemImage: "chevron.forward") {
-                    webView?.goForward()
-                }
-                .disabled(!canGoForward)
+        .onChange(of: connectionManager.displayContent) { new in
+            if new.type == .webview {
+                webViewCounter += 1
             }
         }
-    }
-    
-    var isWebView: Bool {
-        if case .webview(_) = connectionManager.displayContent {
-            return true
-        } else {
-            return false
+        .onChange(of: webViewCounter) { _ in
+            canGoBack = false
+            canGoForward = false
+            webViewTitle = ""
         }
     }
     
@@ -94,8 +80,21 @@ struct DisplayView: View {
             WebView(url: url, canGoBack: $canGoBack, canGoForward: $canGoForward, title: $webViewTitle) {
                 webView = $0
             }
-            .id(url)
+            .id(webViewCounter)
             .navigationTitle(webViewTitle)
+            .toolbar {
+                Button("Home", systemImage: "house") {
+                    webViewCounter += 1
+                }
+                Button("Back", systemImage: "chevron.backward") {
+                    webView?.goBack()
+                }
+                .disabled(!canGoBack)
+                Button("Forward", systemImage: "chevron.forward") {
+                    webView?.goForward()
+                }
+                .disabled(!canGoForward)
+            }
         }
     }
 }

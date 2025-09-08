@@ -24,6 +24,8 @@ struct WebView: UIViewRepresentable {
         let view = WKWebView()
         view.navigationDelegate = context.coordinator
         view.addObserver(context.coordinator, forKeyPath: #keyPath(WKWebView.title), options: .new, context: nil)
+        view.addObserver(context.coordinator, forKeyPath: #keyPath(WKWebView.canGoBack), options: .new, context: nil)
+        view.addObserver(context.coordinator, forKeyPath: #keyPath(WKWebView.canGoForward), options: .new, context: nil)
         return view
     }
     
@@ -50,15 +52,16 @@ struct WebView: UIViewRepresentable {
             self.parent = parent
         }
         
-        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            parent.canGoBack = webView.canGoBack
-            parent.canGoForward = webView.canGoForward
-        }
-        
         override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-            if keyPath == "title", let webView = object as? WKWebView {
+            guard let webView = object as? WKWebView else { return }
+            if keyPath == "title" {
                 Task { @MainActor in
                     parent.title = webView.title ?? ""
+                }
+            } else if keyPath == "canGoBack" || keyPath == "canGoForward" {
+                Task { @MainActor in
+                    parent.canGoBack = webView.canGoBack
+                    parent.canGoForward = webView.canGoForward
                 }
             }
         }
